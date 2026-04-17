@@ -2,7 +2,6 @@ import requests
 import os
 from dotenv import load_dotenv
 from datetime import datetime
-import time
 
 load_dotenv()
 
@@ -83,8 +82,3 @@ def checar():
                 print(f"❌ Indisponível: {DICIONARIO_DIAS[dia]} {agenda['data']} {hora}")
     if msg:
         enviar_telegram(f"🔗 Link: {url_reserva}")
-
-if __name__ == "__main__":
-    while True:
-        checar()  # sua função
-        time.sleep(600)  # 10 minutos
