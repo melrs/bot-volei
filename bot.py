@@ -5,9 +5,11 @@ from datetime import datetime
 
 load_dotenv()
 
-DIAS_MONITORADOS = [0, 2, 5, 6]
-HORA_INICIO = "17:00"
-HORA_FIM = "20:00"
+HORARIOS_MONITORADOS = {
+    0: ("17:00", "20:00"),
+    2: ("17:00", "22:00"),
+    5: ("08:00", "20:00"),
+}
 
 TOKEN = os.getenv("TELEGRAM_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
@@ -25,13 +27,17 @@ def hora_para_minutos(hora_str):
     h, m = map(int, hora_str.split(":"))
     return h * 60 + m
 
-def dentro_do_intervalo(hora_str):
+def dentro_do_intervalo(hora_str, dia):
+    if dia not in HORARIOS_MONITORADOS:
+        return False
+
+    inicio_str, fim_str = HORARIOS_MONITORADOS[dia]
+
     minutos = hora_para_minutos(hora_str)
-    
-    inicio = hora_para_minutos(HORA_INICIO)
-    
-    if HORA_FIM:
-        fim = hora_para_minutos(HORA_FIM)
+    inicio = hora_para_minutos(inicio_str)
+
+    if fim_str:
+        fim = hora_para_minutos(fim_str)
         return inicio <= minutos <= fim
     else:
         return minutos >= inicio
@@ -67,14 +73,14 @@ def checar():
     for agenda in agendas:
         dia = dia_da_semana(agenda["data"])
 
-        if dia not in DIAS_MONITORADOS:
+        if dia not in HORARIOS_MONITORADOS:
             continue
         horas_map = {}
         for h in agenda["horas"]:
             horas_map.setdefault(h["hora"], []).append(h["disponivel"])
 
         for hora, lista in horas_map.items():
-            if dentro_do_intervalo(hora) and any(lista):
+            if dentro_do_intervalo(hora, dia) and any(lista):
                 msg = f"✅ {DICIONARIO_DIAS[dia]} - {agenda['data']} às {hora}"
                 print(msg)
                 enviar_telegram(msg)
@@ -82,3 +88,6 @@ def checar():
                 print(f"❌ Indisponível: {DICIONARIO_DIAS[dia]} {agenda['data']} {hora}")
     if msg:
         enviar_telegram(f"🔗 Link: {url_reserva}")
+
+if __name__ == "__main__":
+    checar()
