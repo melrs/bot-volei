@@ -5,8 +5,6 @@ from datetime import datetime
 
 load_dotenv()
 
-URL = "https://api-reservadeespaco.curitiba.pr.gov.br/api/v1/espacos-fisicos/questionario/resultado?AtividadeId=21&NucleoId=1&EquipamentoUrbanoId=5549&PesquisarProximos=true&QuantidadePessoas=10&DataReferencia=2026-04-22&Pagina=1&QuantidadeResultados=1"
-
 DIAS_MONITORADOS = [0, 2, 5, 6]
 HORA_INICIO = "17:00"
 HORA_FIM = "20:00"
